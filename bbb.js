@@ -46,12 +46,11 @@ async function appendHandler(){
 async function seekAppendHandler(){
   console.log("seekAppendHandler");
   var sourceBuffer = this;
-  if(!sourceBuffer.updating){
-    var seekSegment = await fetch(assetURL, { headers: { Range: "bytes=2209798-3314696" } }); //seek to 25 seconds, range=2209798-3314696
-    seekSegment = await seekSegment.arrayBuffer();
-    sourceBuffer.appendBuffer(seekSegment);
-    video.currentTime = 25;
-  }
+  sourceBuffer.abort();
+  var seekSegment = await fetch(assetURL, { headers: { Range: "bytes=2209798-3314696" } }); //seek to 25 seconds, range=2209798-3314696
+  seekSegment = await seekSegment.arrayBuffer();
+  sourceBuffer.appendBuffer(seekSegment);
+  video.currentTime = 25;
 }
 
 function updateEnd(e){
