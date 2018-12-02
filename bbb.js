@@ -1,7 +1,7 @@
 /*eslint-disable no-var*/ /*eslint-disable vars-on-top*/ /*eslint-disable no-shadow*/
 var video = document.querySelector("video");
 // 0 - 1908 is the actual init segment, 1908 - 141202 is the first media segment.
-var ranges = ["0-141202"]; // "1104899-2209797", "2209798-3314696", "3314697-4419595", "4419596-5524494"
+var ranges = ["0-141202", "2152780-2323092"]; // "1104899-2209797", "2209798-3314696", "3314697-4419595", "4419596-5524494"
 var assetURL = "frag_bunny.mp4";
 var mimeCodec = "video/mp4; codecs=\"avc1.42E01E, mp4a.40.2\"";
 var mediaSource = new MediaSource();
