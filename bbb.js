@@ -1,6 +1,7 @@
 /*eslint-disable no-var*/ /*eslint-disable vars-on-top*/ /*eslint-disable no-shadow*/
 var video = document.querySelector("video");
-var ranges = ["0-1104898", "1104899-2209797", "2209798-3314696", "3314697-4419595", "4419596-5524494"];
+// 0 - 1908 is the actual init segment, 1908 - 141202 is the first media segment.
+var ranges = ["0-141202"]; // "1104899-2209797", "2209798-3314696", "3314697-4419595", "4419596-5524494"
 var assetURL = "frag_bunny.mp4";
 var mimeCodec = "video/mp4; codecs=\"avc1.42E01E, mp4a.40.2\"";
 var mediaSource = new MediaSource();
@@ -47,10 +48,12 @@ async function seekAppendHandler(){
   console.log("seekAppendHandler");
   var sourceBuffer = this;
   if(!sourceBuffer.updating){
-    var seekSegment = await fetch(assetURL, { headers: { Range: "bytes=2209798-3314696" } }); //seek to 25 seconds, range=2209798-3314696
+    // Not sure exactly where 25 seconds, but this was the closest segment range
+    // that you had here, which is 14400 / 1000 (14.4 seconds)
+    var seekSegment = await fetch(assetURL, { headers: { Range: "bytes=2152780-2323092" } }); //seek to 25 seconds, range=2209798-3314696
     seekSegment = await seekSegment.arrayBuffer();
     sourceBuffer.appendBuffer(seekSegment);
-    video.currentTime = 25;
+    video.currentTime = 15;
   }
 }
 
