@@ -47,9 +47,6 @@ async function seekAppendHandler(){
   console.log("seekAppendHandler");
   var sourceBuffer = this;
   if(!sourceBuffer.updating){
-    console.log(video.readyState);
-    if(video.readyState > 1) video.readyState = 1;
-    console.log(video.readyState);
     var seekSegment = await fetch(assetURL, { headers: { Range: "bytes=2209798-3314696" } }); //seek to 25 seconds, range=2209798-3314696
     seekSegment = await seekSegment.arrayBuffer();
     sourceBuffer.appendBuffer(seekSegment);
