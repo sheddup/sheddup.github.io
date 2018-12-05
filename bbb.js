@@ -1,9 +1,7 @@
-/*eslint-disable no-var*/ /*eslint-disable vars-on-top*/ /*eslint-disable no-shadow*/
 var video = document.querySelector("video");
 var assetURL = "frag_copy.mp4";
 var mimeCodec = "video/mp4; codecs=\"avc1.64001f, mp4a.40.2\"";
 var mediaSource = new MediaSource();
-var appendButton = document.getElementById("append");
 var seekButton = document.getElementById("seek");
 
 mediaSource.addEventListener("sourceopen", onSourceOpen.bind(this));
@@ -11,35 +9,17 @@ video.src = window.URL.createObjectURL(mediaSource);
 
 async function onSourceOpen(e){
   console.log("onSourceOpen");
-  var mediaSource = e.target;
-
   var sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
-  // sourceBuffer.mode = "sequence";
-  // sourceBuffer.addEventListener("updateend", updateEnd);
-
-  // Append the initialization segment & first media segment
-  var initSegment = await GetSegment();
+  var initSegment = await GetSegment(); // Append the initialization segment & first media segment
   sourceBuffer.appendBuffer(initSegment.slice(0, 2265772));
-
-  appendButton.onclick = appendHandler.bind(sourceBuffer);
   seekButton.onclick = seekAppendHandler.bind(sourceBuffer);
 }
 
 async function GetSegment(){
   console.log("GetSegment");
-  // var nextRange = ranges.shift();
   var response = await fetch(assetURL);
   response = await response.arrayBuffer();
   return response;
-}
-
-async function appendHandler(){
-  console.log("appendHandler");
-  var sourceBuffer = this;
-  if(!sourceBuffer.updating){
-    var nextSegment = await GetSegment();
-    sourceBuffer.appendBuffer(nextSegment);
-  }
 }
 
 function dumpBuffers() {
@@ -65,13 +45,3 @@ async function seekAppendHandler(){
     }, { once: true});
   }
 }
-
-// function updateEnd(e){
-//   var sourceBuffer = e.target;
-//   if(ranges.length === 0){
-//     console.log("Ending MSE");
-//     mediaSource.endOfStream();
-//     mediaSource.removeEventListener("sourceopen", onSourceOpen);
-//     sourceBuffer.removeEventListener("updateend", appendHandler);
-//   }
-// }
