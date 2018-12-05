@@ -1,77 +1,48 @@
-/*eslint-disable no-var*/ /*eslint-disable vars-on-top*/ /*eslint-disable no-shadow*/
-var video = document.querySelector("video");
-var assetURL = "frag_copy.mp4";
-var mimeCodec = "video/mp4; codecs=\"avc1.64001f, mp4a.40.2\"";
-var mediaSource = new MediaSource();
-var appendButton = document.getElementById("append");
-var seekButton = document.getElementById("seek");
+const assetURL = "frag_copy.mp4";
+const video = document.querySelector("video");
+const mimeCodec = "video/mp4; codecs=\"avc1.64001f, mp4a.40.2\"";
+const mediaSource = new MediaSource();
+const seekButton = document.getElementById("seek");
 
 mediaSource.addEventListener("sourceopen", onSourceOpen.bind(this));
 video.src = window.URL.createObjectURL(mediaSource);
 
 async function onSourceOpen(e){
   console.log("onSourceOpen");
-  var mediaSource = e.target;
 
-  var sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
-  // sourceBuffer.mode = "sequence";
-  // sourceBuffer.addEventListener("updateend", updateEnd);
+  const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
+  const initSegment = await GetSegment("0-2265771"); // Append the initialization segment & first media segment
+  sourceBuffer.appendBuffer(initSegment);
 
-  // Append the initialization segment & first media segment
-  var initSegment = await GetSegment();
-  sourceBuffer.appendBuffer(initSegment.slice(0, 2265772));
-
-  appendButton.onclick = appendHandler.bind(sourceBuffer);
   seekButton.onclick = seekAppendHandler.bind(sourceBuffer);
 }
 
-async function GetSegment(){
-  console.log("GetSegment");
-  // var nextRange = ranges.shift();
-  var response = await fetch(assetURL);
+async function GetSegment(byteRange){
+  console.log("GetSegment: bytes=" + byteRange);
+  let response = await fetch(assetURL, { headers: { Range: "bytes=" + byteRange } });
   response = await response.arrayBuffer();
   return response;
 }
 
-async function appendHandler(){
-  console.log("appendHandler");
-  var sourceBuffer = this;
-  if(!sourceBuffer.updating){
-    var nextSegment = await GetSegment();
-    sourceBuffer.appendBuffer(nextSegment);
+function dumpBuffers(){
+  let out = "";
+  for(let i = 0; i < video.buffered.length; i++){
+    out += "buffer: " + i + " start: " + video.buffered.start(i) + " end: " + video.buffered.end(i) + "\n";
   }
-}
-
-function dumpBuffers() {
-    var out = "";
-    for (var i = 0; i < video.buffered.length; i++) {
-        out += "buffer: " + i + " start: " + video.buffered.start(i) + " end: " + video.buffered.end(i) + "\n";
-    }
-    console.log(out);
+  console.log(out);
 }
 
 async function seekAppendHandler(){
   console.log("seekAppendHandler");
-  var sourceBuffer = this;
+  const sourceBuffer = this;
   if(!sourceBuffer.updating){
     // Not sure exactly where 25 seconds, but this was the closest segment range
     // that you had here, which is 14400 / 1000 (14.4 seconds)
-    var seekSegment = await fetch(assetURL); //seek to 25 seconds
-    seekSegment = await seekSegment.arrayBuffer();
-    sourceBuffer.appendBuffer(seekSegment.slice(4719375, 8588653)); // 2323092
+    const seekSegment = await GetSegment("4719375-8588652"); //seek to 25 seconds
+    sourceBuffer.appendBuffer(seekSegment);
     sourceBuffer.addEventListener("updateend", () => {
-        video.currentTime = 25;
-        dumpBuffers(video);
-    }, { once: true});
+      video.currentTime = 25;
+      dumpBuffers(video);
+    }, { once: true });
   }
 }
-
-// function updateEnd(e){
-//   var sourceBuffer = e.target;
-//   if(ranges.length === 0){
-//     console.log("Ending MSE");
-//     mediaSource.endOfStream();
-//     mediaSource.removeEventListener("sourceopen", onSourceOpen);
-//     sourceBuffer.removeEventListener("updateend", appendHandler);
-//   }
-// }
