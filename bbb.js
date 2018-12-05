@@ -4,10 +4,10 @@ const mimeCodec = "video/mp4; codecs=\"avc1.64001f, mp4a.40.2\"";
 const mediaSource = new MediaSource();
 const seekButton = document.getElementById("seek");
 
-mediaSource.addEventListener("sourceopen", onSourceOpen.bind(this));
+mediaSource.addEventListener("sourceopen", onSourceOpen);
 video.src = window.URL.createObjectURL(mediaSource);
 
-async function onSourceOpen(e){
+async function onSourceOpen(){
   console.log("onSourceOpen");
 
   const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
