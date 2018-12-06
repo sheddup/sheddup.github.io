@@ -1,5 +1,5 @@
-const assetURL = "frag_copy.mp4";
 const video = document.querySelector("video");
+const assetURL = "frag_copy.mp4";
 const mimeCodec = "video/mp4; codecs=\"avc1.64001f, mp4a.40.2\"";
 const mediaSource = new MediaSource();
 const seekButton = document.getElementById("seek");
@@ -9,7 +9,7 @@ video.src = window.URL.createObjectURL(mediaSource);
 
 async function onSourceOpen(){
   console.log("onSourceOpen");
-
+  
   const sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
   const initSegment = await GetSegment("0-2265771"); // Append the initialization segment & first media segment
   sourceBuffer.appendBuffer(initSegment);
